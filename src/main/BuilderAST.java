@@ -128,7 +128,7 @@ public class BuilderAST {
 	{
 		String tipo = ec.getChild(0).getText();
 		TerminalNode op = ec.OP();
-		TerminalNode lit = ec.INTEGER_LITERAL()
+		TerminalNode lit = ec.INTEGER_LITERAL();
 		if (op != null)
 		{
 			Exp exp1 = this.visitExpression(ec.expression(0));
