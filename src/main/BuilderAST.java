@@ -126,14 +126,70 @@ public class BuilderAST {
 	
 	public Exp visitExpression(ExpressionContext ec)
 	{
+		String tipo = ec.getChild(0).getText();
+		TerminalNode op = ec.OP();
+		TerminalNode lit = ec.INTEGER_LITERAL()
+		if (op != null)
+		{
+			Exp exp1 = this.visitExpression(ec.expression(0));
+			Exp exp2 = this.visitExpression(ec.expression(1));
+			switch (op.getText()) {
+			case "&&":
+				return new And(exp1, exp2);
+			case "*":
+				return new Times(exp1, exp2);
+			case "<":
+				return new LessThan(exp1, exp2);
+			case "-":
+				return new Minus(exp1, exp2);
+			case "+":
+				return new Plus(exp1, exp2);
+			}
+		}
+		else if (lit != null)
+		{
+			return new IntegerLiteral(Integer.parseInt(lit.getText()));
+		}
+		else if (tipo.contains("length"))
+		{
+			return new ArrayLength(this.visitExpression(ec.expression(0))); 
+		}
+		else if (ec.getChild(1).getText().contains("["))
+		{
+			return new ArrayLookup(this.visitExpression(ec.expression(0)), this.visitExpression(ec.expression(0))); 
+		}
+		else if (tipo.contains("new"))
+		{
+			if(ec.expression().size() == 1){
+				return new NewArray(this.visitExpression(ec.expression().get(0)));
+			}else{
+				return new NewObject(new Identifier(ec.IDENTIFIER().getText()));
+			}
+		}
+		else if (tipo.contains("false"))
+		{
+			return new False();
+		}
+		else if (tipo.contains("true"))
+		{
+			return new True();
+		}
+		else
+		{
+			return new IdentifierExp(ec.IDENTIFIER().getText());
+		} 	
+		
 		return new NewArray(null);
 	}
 	
+	
+	//para fazer
 	public StatementList visitBlockStament(List<StatementContext> sc)
 	{
 		return new StatementList();
 	}
 	
+	//para fazer
 	public MethodDeclList visitMethodoDeclarationContext(List<MethodDeclarationContext> m)
 	{
 		return new MethodDeclList();
