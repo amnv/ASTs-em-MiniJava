@@ -22,7 +22,8 @@ public class Start {
 			amnv_jrmParser parser = new amnv_jrmParser(token);
 			
 			//ajeitar a partir daqui
-			Program prog = new BuilderAST().visit(parser.goal());
+			Program prog;
+			prog  = new BuilderAST().visit(parser.goal());
 			
 			prog.accept(new PrettyPrintVisitor());
 			//visitor.visit(program);
