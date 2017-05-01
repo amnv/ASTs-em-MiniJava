@@ -42,7 +42,9 @@ public class BuilderAST {
 		if (id.size() > 1)
 		{
 			Identifier id1 = this.visitIdentifier(c.IDENTIFIER(0));
+		
 			Identifier id2 = this.visitIdentifier(c.IDENTIFIER(1));	
+		
 			return new  ClassDeclExtends(id1, id2, vdl,mdl);
 		}
 		
@@ -69,7 +71,8 @@ public class BuilderAST {
 	
 	public Type visitTypeContext(TypeContext t)
 	{
-		String type = t.getText();
+		String type;
+		type =t.getText();
 		Type ret;
 		if (type.contains("int"))
 		{
