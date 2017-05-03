@@ -21,12 +21,11 @@ public class Start {
 			CommonTokenStream token = new CommonTokenStream(lexer);
 			amnv_jrmParser parser = new amnv_jrmParser(token);
 			
-			//ajeitar a partir daqui
-			Program prog;
-			prog  = new BuilderAST().visit(parser.goal());
+			//ajeitar BuilderAST
+			Program prog = new BuilderAST().visitGoal(parser.goal());
 			
 			prog.accept(new PrettyPrintVisitor());
-			//visitor.visit(program);
+			//visitor.visit(program);......;.
 			entrada.close();
 		} catch (FileNotFoundException e) {}
 		catch (IOException e) {
