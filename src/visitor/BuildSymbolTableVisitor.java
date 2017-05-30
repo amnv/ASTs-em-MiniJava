@@ -57,6 +57,7 @@ public class BuildSymbolTableVisitor implements Visitor {
 	// MainClass m;
 	// ClassDeclList cl;
 	public void visit(Program n) {
+		
 		n.m.accept(this);
 		for (int i = 0; i < n.cl.size(); i++) {
 			n.cl.elementAt(i).accept(this);
@@ -66,22 +67,33 @@ public class BuildSymbolTableVisitor implements Visitor {
 	// Identifier i1,i2;
 	// Statement s;
 	public void visit(MainClass n) {
+		symbolTable.addClass(n.i1.s, null);
+		this.currClass = symbolTable.getClass(n.i1.s);
+		this.currClass.addMethod("main", null);
+		this.currMethod = this.currClass.getMethod("main");
+		this.currMethod.addParam(n.i2.s, null);
 		n.i1.accept(this);
 		n.i2.accept(this);
+		
 		n.s.accept(this);
+		this.currMethod = null;
 	}
 
 	// Identifier i;
 	// VarDeclList vl;
 	// MethodDeclList ml;
 	public void visit(ClassDeclSimple n) {
+		
 		n.i.accept(this);
+		this.symbolTable.addClass(n.i.s, null);
+		this.currClass = this.symbolTable.getClass(n.i.s);
 		for (int i = 0; i < n.vl.size(); i++) {
 			n.vl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.ml.size(); i++) {
 			n.ml.elementAt(i).accept(this);
 		}
+		this.currClass = null;
 	}
 
 	// Identifier i;
@@ -91,19 +103,31 @@ public class BuildSymbolTableVisitor implements Visitor {
 	public void visit(ClassDeclExtends n) {
 		n.i.accept(this);
 		n.j.accept(this);
+		this.symbolTable.addClass(n.i.s, n.j.s);
+		this.currClass = this.symbolTable.getClass(n.i.s);
 		for (int i = 0; i < n.vl.size(); i++) {
 			n.vl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.ml.size(); i++) {
 			n.ml.elementAt(i).accept(this);
 		}
+		this.currClass = null;
 	}
 
 	// Type t;
 	// Identifier i;
 	public void visit(VarDecl n) {
+		if(this.currClass != null){
+			if(this.currMethod != null){
+				this.currMethod.addVar(n.i.s, n.t);
+			}else{
+				this.currClass.addVar(n.i.s, n.t);
+			}
+		}
 		n.t.accept(this);
 		n.i.accept(this);
+		
+	
 	}
 
 	// Type t;
@@ -113,18 +137,25 @@ public class BuildSymbolTableVisitor implements Visitor {
 	// StatementList sl;
 	// Exp e;
 	public void visit(MethodDecl n) {
+		
 		n.t.accept(this);
 		n.i.accept(this);
+		this.currClass.addMethod(n.i.s, n.t);
+		this.currMethod = this.currClass.getMethod(n.i.s);
+	
 		for (int i = 0; i < n.fl.size(); i++) {
-			n.fl.elementAt(i).accept(this);
+			if(n.fl.elementAt(i) != null){ 
+				n.fl.elementAt(i).accept(this);
+			}
 		}
 		for (int i = 0; i < n.vl.size(); i++) {
-			n.vl.elementAt(i).accept(this);
+			if(n.vl.elementAt(i) != null) n.vl.elementAt(i).accept(this);
 		}
 		for (int i = 0; i < n.sl.size(); i++) {
 			n.sl.elementAt(i).accept(this);
 		}
 		n.e.accept(this);
+		this.currMethod = null;
 	}
 
 	// Type t;
@@ -132,19 +163,24 @@ public class BuildSymbolTableVisitor implements Visitor {
 	public void visit(Formal n) {
 		n.t.accept(this);
 		n.i.accept(this);
+		this.currMethod.addParam(n.i.s, n.t);
 	}
 
 	public void visit(IntArrayType n) {
+		
 	}
 
 	public void visit(BooleanType n) {
+		
 	}
 
 	public void visit(IntegerType n) {
+		
 	}
 
 	// String s;
 	public void visit(IdentifierType n) {
+		
 	}
 
 	// StatementList sl;
@@ -237,18 +273,21 @@ public class BuildSymbolTableVisitor implements Visitor {
 		n.e.accept(this);
 		n.i.accept(this);
 		for (int i = 0; i < n.el.size(); i++) {
-			n.el.elementAt(i).accept(this);
+			if(n.el.elementAt(i) != null) n.el.elementAt(i).accept(this);
 		}
 	}
 
 	// int i;
 	public void visit(IntegerLiteral n) {
+		
 	}
 
 	public void visit(True n) {
+		
 	}
 
 	public void visit(False n) {
+		
 	}
 
 	// String s;
@@ -256,6 +295,7 @@ public class BuildSymbolTableVisitor implements Visitor {
 	}
 
 	public void visit(This n) {
+		
 	}
 
 	// Exp e;
@@ -265,6 +305,8 @@ public class BuildSymbolTableVisitor implements Visitor {
 
 	// Identifier i;
 	public void visit(NewObject n) {
+		n.i.accept(this);
+		
 	}
 
 	// Exp e;
@@ -274,5 +316,6 @@ public class BuildSymbolTableVisitor implements Visitor {
 
 	// String s;
 	public void visit(Identifier n) {
+		
 	}
 }

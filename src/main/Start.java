@@ -23,10 +23,16 @@ public class Start {
 			
 			//ajeitar BuilderAST
 			Program prog = new BuilderAST().visitGoal(parser.goal());
-			
+			BuildSymbolTableVisitor stVis = new BuildSymbolTableVisitor();
+			//construindo tabela de símbolos
+			prog.accept(stVis); 
+			//fazendo a checagem de tipos
+			prog.accept(new TypeCheckVisitor(stVis.getSymbolTable())); 
+/*
 			prog.accept(new PrettyPrintVisitor());
 			//visitor.visit(program);......;.
 			entrada.close();
+*/		
 		} catch (FileNotFoundException e) {}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
